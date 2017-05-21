@@ -1,0 +1,22 @@
+{
+  "name": "mofron-effect-draggable",
+  "version": "0.0.1",
+  "description": "draggable effect for mofron component",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/simpart/mofron-effect-draggable.git"
+  },
+  "keywords": [
+    "mofron"
+  ],
+  "author": "simparts",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/simpart/mofron-effect-draggable/issues"
+  },
+  "homepage": "https://github.com/simpart/mofron-effect-draggable#readme"
+}
