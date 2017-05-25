@@ -55,7 +55,7 @@ mofron.effect.Draggable = class extends mofron.Effect {
                 }
                 tgt.addEvent(
                     new mofron.event.Drag({
-                        addType : ['dragstart','dragend'],
+                        addType : ['drag', 'dragstart', 'dragend'],
                         handler : new mofron.Param(fnc, this)
                     })
                 );

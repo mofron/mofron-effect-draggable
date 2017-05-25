@@ -1,6 +1,6 @@
 {
   "name": "mofron-effect-draggable",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "draggable effect for mofron component",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,7 @@
     "url": "git+https://github.com/simpart/mofron-effect-draggable.git"
   },
   "dependencies": {
-    "mofron-event-drag" : "",
+    "mofron-event-drag" : ""
   },
   "keywords": [
     "mofron"
