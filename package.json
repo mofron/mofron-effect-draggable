@@ -1,6 +1,6 @@
 {
   "name": "mofron-effect-draggable",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "draggable effect for mofron component",
   "main": "index.js",
   "scripts": {

@@ -118,7 +118,7 @@ mofron.effect.Draggable = class extends mofron.Effect {
     dragStart (tgt) {
         try {
             tgt.style({
-                position : 'absolute',
+                position : 'relative',
             });
             setTimeout(
                 (prm) => {
@@ -139,6 +139,7 @@ mofron.effect.Draggable = class extends mofron.Effect {
                 let stpos = this.mousePos();
                 this.m_stpos = [stpos[0], stpos[1]];
             }
+            mofron.effect.draggable_comp = tgt;
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -164,6 +165,7 @@ mofron.effect.Draggable = class extends mofron.Effect {
             });
             
             this.m_stpos = null;
+            mofron.effect.draggable_comp = null;
             tgt.visible(true);
         } catch (e) {
             console.error(e.stack);
@@ -193,4 +195,5 @@ mofron.effect.Draggable = class extends mofron.Effect {
     }
 }
 mofron.effect.draggable = {};
+mofron.effect.draggable_comp = null;
 module.exports = mofron.effect.Draggable;
