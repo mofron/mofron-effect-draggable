@@ -2,13 +2,14 @@
  * @file mofron-effect-draggable/index.js
  * @author simpart
  */
-require('mofron-event-drag');
+let mf = require('mofron');
+let Drag = require('mofron-event-drag');
 
 /**
  * @class mofron.effect.Drag
  * @brief drag effect class
  */
-mofron.effect.Draggable = class extends mofron.Effect {
+mf.effect.Draggable = class extends mf.Effect {
     
     constructor (prm) {
         try {
@@ -23,6 +24,10 @@ mofron.effect.Draggable = class extends mofron.Effect {
         }
     }
     
+    /**
+     * switching enable drag effect.
+     * enable target component draggable, and initialize some callback
+     */
     enable (tgt) {
         try {
             this.m_enabled = true;
@@ -33,10 +38,11 @@ mofron.effect.Draggable = class extends mofron.Effect {
                 cursor   : '-webkit-grab'
             });
             if (false === this.m_init) {
-                // set drag event
+                /* set drag event callback */
                 let fnc = (tgt, type, prm) => {
                     try {
                         if (false === prm.isEnabled()) {
+                            /* this effect is disabled, skip event */
                             return;
                         }
                         if ('dragstart' === type) {
@@ -54,13 +60,13 @@ mofron.effect.Draggable = class extends mofron.Effect {
                     }
                 }
                 tgt.addEvent(
-                    new mofron.event.Drag({
+                    new Drag({
                         addType : ['drag', 'dragstart', 'dragend'],
-                        handler : new mofron.Param(fnc, this)
+                        handler : new mf.Param(fnc, this)
                     })
                 );
                 
-                /* set mouse event */
+                /* set event callback for mouse position */
                 let eff     = this;
                 let msc_fnc = (e) => {
                     try {
@@ -91,6 +97,9 @@ mofron.effect.Draggable = class extends mofron.Effect {
         }
     }
     
+    /**
+     * switching disable, target component could not drag.
+     */
     disable () {
         try {
             this.m_enabled = false;
@@ -106,6 +115,12 @@ mofron.effect.Draggable = class extends mofron.Effect {
         }
     }
     
+    /**
+     * get enable flag
+     *
+     * @return true : this component is draggable (enable)
+     * @return false : this component is not draggable (disable)
+     */
     isEnabled () {
         try {
             return this.m_enabled;
@@ -139,7 +154,9 @@ mofron.effect.Draggable = class extends mofron.Effect {
                 let stpos = this.mousePos();
                 this.m_stpos = [stpos[0], stpos[1]];
             }
-            mofron.effect.draggable_comp = tgt;
+            if (null === mf.func.getTemp(this.getDragTempKey())) {
+                mf.func.setTemp(this.getDragTempKey(), tgt);
+            }
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -165,7 +182,7 @@ mofron.effect.Draggable = class extends mofron.Effect {
             });
             
             this.m_stpos = null;
-            mofron.effect.draggable_comp = null;
+            mf.func.setTemp(this.getDragTempKey(), null);
             tgt.visible(true);
         } catch (e) {
             console.error(e.stack);
@@ -173,6 +190,12 @@ mofron.effect.Draggable = class extends mofron.Effect {
         }
     }
     
+    /**
+     * mouse position getter / setter
+     *
+     * @param x : x position
+     * @param y : y position
+     */
     mousePos (x, y) {
         try {
             if (undefined === x) {
@@ -193,7 +216,14 @@ mofron.effect.Draggable = class extends mofron.Effect {
             throw e;
         }
     }
+    
+    getDragTempKey () {
+        try {
+            return 'draggable-comp';
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
 }
-mofron.effect.draggable = {};
-mofron.effect.draggable_comp = null;
 module.exports = mofron.effect.Draggable;
