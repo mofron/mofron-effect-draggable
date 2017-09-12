@@ -154,8 +154,8 @@ mf.effect.Draggable = class extends mf.Effect {
                 let stpos = this.mousePos();
                 this.m_stpos = [stpos[0], stpos[1]];
             }
-            if (null === mf.func.getTemp(this.getDragTempKey())) {
-                mf.func.setTemp(this.getDragTempKey(), tgt);
+            if (null === mf.func.getTemp(this.getTempKey())) {
+                mf.func.setTemp(this.getTempKey(), tgt);
             }
         } catch (e) {
             console.error(e.stack);
@@ -182,7 +182,7 @@ mf.effect.Draggable = class extends mf.Effect {
             });
             
             this.m_stpos = null;
-            mf.func.setTemp(this.getDragTempKey(), null);
+            mf.func.setTemp(this.getTempKey(), null);
             tgt.visible(true);
         } catch (e) {
             console.error(e.stack);
@@ -217,7 +217,7 @@ mf.effect.Draggable = class extends mf.Effect {
         }
     }
     
-    getDragTempKey () {
+    getTempKey () {
         try {
             return 'draggable-comp';
         } catch (e) {
