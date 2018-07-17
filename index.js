@@ -24,6 +24,19 @@ mf.effect.Draggable = class extends mf.Effect {
         }
     }
     
+    contents (flg, cmp) {
+        try {
+            if (true === flg) {
+                this.enable(cmp);
+            } else {
+                this.disable(cmp);
+            }
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
     /**
      * switching enable drag effect.
      * enable target component draggable, and initialize some callback
@@ -100,7 +113,7 @@ mf.effect.Draggable = class extends mf.Effect {
     /**
      * switching disable, target component could not drag.
      */
-    disable () {
+    disable (tgt) {
         try {
             this.m_enabled = false;
             tgt.target().attr({
@@ -154,9 +167,6 @@ mf.effect.Draggable = class extends mf.Effect {
                 let stpos = this.mousePos();
                 this.m_stpos = [stpos[0], stpos[1]];
             }
-            if (null === mf.func.getTemp(this.getTempKey())) {
-                mf.func.setTemp(this.getTempKey(), tgt);
-            }
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -170,19 +180,18 @@ mf.effect.Draggable = class extends mf.Effect {
             }
             let pos     = this.mousePos();
             let cmp_pos = [
-                mofron.func.getLength(tgt.vdom().style('left')),
-                mofron.func.getLength(tgt.vdom().style('top'))
+                mofron.func.getLength(tgt.adom().style('left')),
+                mofron.func.getLength(tgt.adom().style('top'))
             ];
             cmp_pos[0] = (null === cmp_pos[0]) ? 0 : cmp_pos[0];
             cmp_pos[1] = (null === cmp_pos[1]) ? 0 : cmp_pos[1];
             
-            tgt.vdom().style({
+            tgt.adom().style({
                 left : cmp_pos[0] + (pos[0] - this.m_stpos[0])  + 'px',
                 top  : cmp_pos[1] + (pos[1] - this.m_stpos[1]) + 'px'
             });
             
             this.m_stpos = null;
-            mf.func.setTemp(this.getTempKey(), null);
             tgt.visible(true);
         } catch (e) {
             console.error(e.stack);
@@ -216,14 +225,6 @@ mf.effect.Draggable = class extends mf.Effect {
             throw e;
         }
     }
-    
-    getTempKey () {
-        try {
-            return 'draggable-comp';
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
 }
 module.exports = mofron.effect.Draggable;
+/* end of file */
