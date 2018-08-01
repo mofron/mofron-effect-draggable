@@ -16,21 +16,7 @@ mf.effect.Draggable = class extends mf.Effect {
             super();
             this.name('Draggable');
             this.m_enabled = false;
-            this.m_init    = false;
             this.m_stpos   = null;
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    contents (flg, cmp) {
-        try {
-            if (true === flg) {
-                this.enable(cmp);
-            } else {
-                this.disable(cmp);
-            }
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -50,59 +36,9 @@ mf.effect.Draggable = class extends mf.Effect {
             tgt.style({
                 cursor   : '-webkit-grab'
             });
-            if (false === this.m_init) {
-                /* set drag event callback */
-                let fnc = (tgt, type, prm) => {
-                    try {
-                        if (false === prm.isEnabled()) {
-                            /* this effect is disabled, skip event */
-                            return;
-                        }
-                        if ('dragstart' === type) {
-                            prm.dragStart(tgt);
-                        } else if ('drag' === type) {
-                            prm.drag(tgt);
-                        } else if ('dragend' === type) {
-                            prm.dragEnd(tgt);
-                        } else {
-                            throw new Error('not supported type');
-                        }
-                    } catch (e) {
-                        console.error(e.stack);
-                        throw e;
-                    }
-                }
-                tgt.addEvent(
-                    new Drag({
-                        addType : ['drag', 'dragstart', 'dragend'],
-                        handler : new mf.Param(fnc, this)
-                    })
-                );
-                
-                /* set event callback for mouse position */
-                let eff     = this;
-                let msc_fnc = (e) => {
-                    try {
-                        if ( (0 === e.clientX) && (0 === e.clientY) ) {
-                            return;
-                        }
-                        eff.mousePos(
-                            e.clientX,
-                            e.clientY
-                        );
-                    } catch (e) {
-                        console.error(e.stack);
-                        throw e;
-                    }
-                }
-                if (document.addEventListener) {
-	            document.addEventListener("drag", msc_fnc);
-                    document.addEventListener("dragstart", msc_fnc);
-	        } else if (document.attachEvent) {
-	            document.attachEvent("ondrag", msc_fnc);
-                    document.attachEvent("ondragstart", msc_fnc);
-	        }
-                this.m_init = true;
+            if (false === this.initFlag()) {
+                this.init();
+                this.initFlag(true);
             }
         } catch (e) {
             console.error(e.stack);
@@ -122,6 +58,81 @@ mf.effect.Draggable = class extends mf.Effect {
             tgt.style({
                 cursor   : 'auto'
             });
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    initFlag (prm) {
+        try {
+            if (undefined === prm) {
+                /* getter */
+                return (undefined === this.m_initflg) ? false : this.m_initflg;
+            }
+            /* setter */
+            if ('boolean' !== typeof prm) {
+                throw new Error('invalid parameter');
+            }
+            this.m_initflg = prm;
+        } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    init () {
+        try {
+            /* set drag event callback */
+            let fnc = (tgt, type, prm) => {
+                try {
+                    if (false === prm.isEnabled()) {
+                        /* this effect is disabled, skip event */
+                        return;
+                    }
+                    if ('dragstart' === type) {
+                        prm.dragStart(tgt);
+                    } else if ('drag' === type) {
+                        prm.drag(tgt);
+                    } else if ('dragend' === type) {
+                        prm.dragEnd(tgt);
+                    } else {
+                        throw new Error('not supported type');
+                    }
+                } catch (e) {
+                    console.error(e.stack);
+                    throw e;
+                }
+            }
+            this.component().addEvent(
+                new Drag({
+                    addType : ['drag', 'dragstart', 'dragend'],
+                    handler : new mf.Param(fnc, this)
+                })
+            );
+            /* set event callback for mouse position */
+            let eff     = this;
+            let msc_fnc = (e) => {
+                try {
+                    if ( (0 === e.clientX) && (0 === e.clientY) ) {
+                        return;
+                    }
+                    eff.mousePos(
+                        e.clientX,
+                        e.clientY
+                    );
+                } catch (e) {
+                    console.error(e.stack);
+                    throw e;
+                }
+            }
+            if (document.addEventListener) {
+                document.addEventListener("drag", msc_fnc);
+                document.addEventListener("dragstart", msc_fnc);
+            } else if (document.attachEvent) {
+                document.attachEvent("ondrag", msc_fnc);
+                document.attachEvent("ondragstart", msc_fnc);
+            }
         } catch (e) {
             console.error(e.stack);
             throw e;
