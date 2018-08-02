@@ -11,11 +11,10 @@ let Drag = require('mofron-event-drag');
  */
 mf.effect.Draggable = class extends mf.Effect {
     
-    constructor (prm) {
+    constructor () {
         try {
             super();
             this.name('Draggable');
-            this.m_enabled = false;
             this.m_stpos   = null;
         } catch (e) {
             console.error(e.stack);
@@ -29,7 +28,6 @@ mf.effect.Draggable = class extends mf.Effect {
      */
     enable (tgt) {
         try {
-            this.m_enabled = true;
             tgt.target().attr({
                 draggable : "true"
             });
@@ -51,7 +49,6 @@ mf.effect.Draggable = class extends mf.Effect {
      */
     disable (tgt) {
         try {
-            this.m_enabled = false;
             tgt.target().attr({
                 draggable : "false"
             });
@@ -83,33 +80,24 @@ mf.effect.Draggable = class extends mf.Effect {
     
     init () {
         try {
-            /* set drag event callback */
-            let fnc = (tgt, type, prm) => {
-                try {
-                    if (false === prm.isEnabled()) {
-                        /* this effect is disabled, skip event */
-                        return;
-                    }
-                    if ('dragstart' === type) {
-                        prm.dragStart(tgt);
-                    } else if ('drag' === type) {
-                        prm.drag(tgt);
-                    } else if ('dragend' === type) {
-                        prm.dragEnd(tgt);
-                    } else {
-                        throw new Error('not supported type');
-                    }
-                } catch (e) {
-                    console.error(e.stack);
-                    throw e;
-                }
-            }
-            this.component().addEvent(
-                new Drag({
-                    addType : ['drag', 'dragstart', 'dragend'],
-                    handler : new mf.Param(fnc, this)
-                })
-            );
+            let eff_drg = this;
+            this.component().event([
+                new Drag(
+                    () => { eff_drg.drag(eff_drg.component()); },
+                    null,
+                    'drag'
+                ),
+                new Drag(
+                    () => { eff_drg.dragStart(eff_drg.component()); },
+                    null,
+                    'dragstart'
+                ),
+                new Drag(
+                    () => { eff_drg.dragEnd(eff_drg.component()); },
+                    null,
+                    'dragend'
+                )
+            ]);
             /* set event callback for mouse position */
             let eff     = this;
             let msc_fnc = (e) => {
@@ -133,21 +121,6 @@ mf.effect.Draggable = class extends mf.Effect {
                 document.attachEvent("ondrag", msc_fnc);
                 document.attachEvent("ondragstart", msc_fnc);
             }
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    /**
-     * get enable flag
-     *
-     * @return true : this component is draggable (enable)
-     * @return false : this component is not draggable (disable)
-     */
-    isEnabled () {
-        try {
-            return this.m_enabled;
         } catch (e) {
             console.error(e.stack);
             throw e;
