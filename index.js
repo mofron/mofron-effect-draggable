@@ -2,8 +2,8 @@
  * @file mofron-effect-draggable/index.js
  * @author simpart
  */
-let mf = require('mofron');
-let Drag = require('mofron-event-drag');
+const mf   = require('mofron');
+const Drag = require('mofron-event-drag');
 
 /**
  * @class mofron.effect.Drag
@@ -15,7 +15,7 @@ mf.effect.Draggable = class extends mf.Effect {
         try {
             super();
             this.name('Draggable');
-            this.m_stpos   = null;
+            this.m_stpos = null;
         } catch (e) {
             console.error(e.stack);
             throw e;
@@ -80,21 +80,18 @@ mf.effect.Draggable = class extends mf.Effect {
     
     init () {
         try {
-            let eff_drg = this;
+            let eff_obj = this;
             this.component().event([
                 new Drag(
-                    () => { eff_drg.drag(eff_drg.component()); },
-                    null,
+                    () => { eff_obj.drag(eff_obj.component()); },
                     'drag'
                 ),
                 new Drag(
-                    () => { eff_drg.dragStart(eff_drg.component()); },
-                    null,
+                    () => { eff_obj.dragStart(eff_obj.component()); },
                     'dragstart'
                 ),
                 new Drag(
-                    () => { eff_drg.dragEnd(eff_drg.component()); },
-                    null,
+                    () => { eff_obj.dragEnd(eff_obj.component()); },
                     'dragend'
                 )
             ]);
@@ -115,10 +112,10 @@ mf.effect.Draggable = class extends mf.Effect {
                 }
             }
             if (document.addEventListener) {
-                document.addEventListener("drag", msc_fnc);
+                document.addEventListener("drag"     , msc_fnc);
                 document.addEventListener("dragstart", msc_fnc);
             } else if (document.attachEvent) {
-                document.attachEvent("ondrag", msc_fnc);
+                document.attachEvent("ondrag"     , msc_fnc);
                 document.attachEvent("ondragstart", msc_fnc);
             }
         } catch (e) {
@@ -164,8 +161,8 @@ mf.effect.Draggable = class extends mf.Effect {
             }
             let pos     = this.mousePos();
             let cmp_pos = [
-                mofron.func.getLength(tgt.adom().style('left')),
-                mofron.func.getLength(tgt.adom().style('top'))
+                mf.func.getSize(tgt.adom().style('left'))[0],
+                mf.func.getSize(tgt.adom().style('top'))[0]
             ];
             cmp_pos[0] = (null === cmp_pos[0]) ? 0 : cmp_pos[0];
             cmp_pos[1] = (null === cmp_pos[1]) ? 0 : cmp_pos[1];
@@ -210,5 +207,5 @@ mf.effect.Draggable = class extends mf.Effect {
         }
     }
 }
-module.exports = mofron.effect.Draggable;
+module.exports = mf.effect.Draggable;
 /* end of file */
