@@ -1,211 +1,121 @@
 /**
  * @file mofron-effect-draggable/index.js
- * @author simpart
+ * @brief draggable effect module for mofron component
+ * @license MIT
  */
-const mf   = require('mofron');
-const Drag = require('mofron-event-drag');
+const Drag    = require('mofron-event-drag');
+const MouseUp = require('mofron-event-mouseup');
+const ConfArg = mofron.class.ConfArg;
+const comutl  = mofron.util.common;
 
-/**
- * @class mofron.effect.Drag
- * @brief drag effect class
- */
-mf.effect.Draggable = class extends mf.Effect {
-    
-    constructor () {
+module.exports = class extends mofron.class.Effect {
+    /**
+     * initialize effect
+     * 
+     * @param (mixed) 
+     *                key-value: effect config
+     * @short
+     * @type private
+     */
+    constructor (p1) {
         try {
             super();
-            this.name('Draggable');
-            this.m_stpos = null;
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    /**
-     * switching enable drag effect.
-     * enable target component draggable, and initialize some callback
-     */
-    enable (tgt) {
-        try {
-            tgt.target().attr({
-                draggable : "true"
-            });
-            tgt.style({
-                cursor   : '-webkit-grab'
-            });
-            if (false === this.initFlag()) {
-                this.init();
-                this.initFlag(true);
-            }
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    /**
-     * switching disable, target component could not drag.
-     */
-    disable (tgt) {
-        try {
-            tgt.target().attr({
-                draggable : "false"
-            });
-            tgt.style({
-                cursor   : 'auto'
-            });
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    initFlag (prm) {
-        try {
-            if (undefined === prm) {
-                /* getter */
-                return (undefined === this.m_initflg) ? false : this.m_initflg;
-            }
-            /* setter */
-            if ('boolean' !== typeof prm) {
-                throw new Error('invalid parameter');
-            }
-            this.m_initflg = prm;
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    init () {
-        try {
-            let eff_obj = this;
-            this.component().event([
-                new Drag(
-                    () => { eff_obj.drag(eff_obj.component()); },
-                    'drag'
-                ),
-                new Drag(
-                    () => { eff_obj.dragStart(eff_obj.component()); },
-                    'dragstart'
-                ),
-                new Drag(
-                    () => { eff_obj.dragEnd(eff_obj.component()); },
-                    'dragend'
-                )
+            this.modname("Draggable");
+
+            /* init config */
+	    this.confmng().add('is_drag', { type:'boolean', init:false });
+            this.confmng().add('drag_base_pos', { type:'array', init:[-1,-1] });
+            this.confmng().add('dragTarget', { type:'object' });
+            this.confmng().add("dragArea", { type:'array', init:[-1,-1,-1,-1] });
+            
+	    if (0 < arguments.length) {
+                this.config(p1);
+	    }
+            
+            let thisobj = this;
+	    mofron.window.event([
+	        //new Drag(new ConfArg(window_drag,this)),
+                new Drag((d1,d2,d3) => { thisobj.drag(d1,d2,thisobj); }),
+                new MouseUp(() => { thisobj.is_drag(false); })
             ]);
-            /* set event callback for mouse position */
-            let eff     = this;
-            let msc_fnc = (e) => {
-                try {
-                    if ( (0 === e.clientX) && (0 === e.clientY) ) {
-                        return;
-                    }
-                    eff.mousePos(
-                        e.clientX,
-                        e.clientY
-                    );
-                } catch (e) {
-                    console.error(e.stack);
-                    throw e;
-                }
-            }
-            if (document.addEventListener) {
-                document.addEventListener("drag"     , msc_fnc);
-                document.addEventListener("dragstart", msc_fnc);
-            } else if (document.attachEvent) {
-                document.attachEvent("ondrag"     , msc_fnc);
-                document.attachEvent("ondragstart", msc_fnc);
-            }
+
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
     
-    dragStart (tgt) {
+    dragArea (left, right, top, bottom) {
         try {
-            tgt.style({
-                position : 'relative',
-            });
-            setTimeout(
-                (prm) => {
-                    prm.visible(false);
-                },
-                50,
-                tgt
-            );
-        } catch (e) {
+	    if (undefined === left) {
+                return this.confmng("dragArea");
+	    }
+	    this.confmng("dragArea", [left, right, top, bottom]);
+	} catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
-    
-    drag (tgt) {
+
+
+    drag (w1,w2,w3) {
         try {
-            if (null === this.m_stpos) {
-                let stpos = this.mousePos();
-                this.m_stpos = [stpos[0], stpos[1]];
-            }
-        } catch (e) {
-            console.error(e.stack);
-            throw e;
-        }
-    }
-    
-    dragEnd (tgt) {
-        try {
-            if (null === this.m_stpos) {
+            if (true === w3.suspend()) {
+                /* skip effect */
                 return;
             }
-            let pos     = this.mousePos();
-            let cmp_pos = [
-                mf.func.getSize(tgt.adom().style('left'))[0],
-                mf.func.getSize(tgt.adom().style('top'))[0]
-            ];
-            cmp_pos[0] = (null === cmp_pos[0]) ? 0 : cmp_pos[0];
-            cmp_pos[1] = (null === cmp_pos[1]) ? 0 : cmp_pos[1];
+            let comp_pos = {
+                'left': comutl.getsize(w3.component().style('left')).toPixel(),
+                'top': comutl.getsize(w3.component().style('top')).toPixel()
+            };
+            let comp_siz = {
+                'height': comutl.getsize(w3.component().height()).toPixel(),
+                'width': comutl.getsize(w3.component().width()).toPixel()
+            }
             
-            tgt.adom().style({
-                left : cmp_pos[0] + (pos[0] - this.m_stpos[0])  + 'px',
-                top  : cmp_pos[1] + (pos[1] - this.m_stpos[1]) + 'px'
-            });
-            
-            this.m_stpos = null;
-            tgt.visible(true);
+            /* check drag */
+            if (true === w3.is_drag()) {
+                /* dragging */
+                // update position
+                let base_pos = w3.confmng('drag_base_pos');
+                w3.component().style({
+                    'left': w2.pageX - base_pos[0] + 'px',
+                    'top': w2.pageY - base_pos[1] + 'px'
+                });
+            } else {
+                /* start drag */
+                // check drag area
+                let drag_area = w3.dragArea();
+                if ( !(comp_pos.left+drag_area[0] < w2.pageX) &&
+                     !((comp_pos.left+drag_area[1]) > w2.pageX) ) {
+                    return;
+                } else if ( !(comp_pos.top+drag_area[2] < w2.pageY) &&
+                            !((comp_pos.top+drag_area[3]) > w2.pageY) ) {
+                    return;
+                }
+                
+                // update drag status
+                w3.is_drag(true);
+                
+                // set base position
+                w3.confmng('drag_base_pos', [w2.pageX-comp_pos.left, w2.pageY-comp_pos.top]);
+            }
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
-    
-    /**
-     * mouse position getter / setter
-     *
-     * @param x : x position
-     * @param y : y position
-     */
-    mousePos (x, y) {
+
+    is_drag (prm) {
         try {
-            if (undefined === x) {
-                /* getter */
-                return (undefined === this.m_mousep) ? null : this.m_mousep;
+            if (false === prm) {
+                this.confmng('drag_base_pos', [-1,-1]);
             }
-            /* setter */
-            if ( ('number' !== typeof x) || ('number' !== typeof y) ) {
-                throw new Error('invalid parameter');
-            }
-            if (undefined === this.m_mousep) {
-                this.m_mousep = new Array(null, null);
-            }
-            this.m_mousep[0] = x;
-            this.m_mousep[1] = y;
+            return this.confmng('is_drag', prm);
         } catch (e) {
             console.error(e.stack);
             throw e;
         }
     }
 }
-module.exports = mf.effect.Draggable;
 /* end of file */
