@@ -34,7 +34,6 @@ module.exports = class extends mofron.class.Effect {
             
             let thisobj = this;
 	    mofron.window.event([
-	        //new Drag(new ConfArg(window_drag,this)),
                 new Drag((d1,d2,d3) => { thisobj.drag(d1,d2,thisobj); }),
                 new MouseUp(() => { thisobj.is_drag(false); })
             ]);
@@ -64,6 +63,7 @@ module.exports = class extends mofron.class.Effect {
                 /* skip effect */
                 return;
             }
+
             let comp_pos = {
                 'left': comutl.getsize(w3.component().style('left')).toPixel(),
                 'top': comutl.getsize(w3.component().style('top')).toPixel()
@@ -86,14 +86,11 @@ module.exports = class extends mofron.class.Effect {
                 /* start drag */
                 // check drag area
                 let drag_area = w3.dragArea();
-                if ( !(comp_pos.left+drag_area[0] < w2.pageX) &&
-                     !((comp_pos.left+drag_area[1]) > w2.pageX) ) {
+                if ( !((comp_pos.left+drag_area[0] < w2.pageX) && ((comp_pos.left+drag_area[1]) > w2.pageX)) ) {
                     return;
-                } else if ( !(comp_pos.top+drag_area[2] < w2.pageY) &&
-                            !((comp_pos.top+drag_area[3]) > w2.pageY) ) {
+                } else if ( !((comp_pos.top+drag_area[2] < w2.pageY) && ((comp_pos.top+drag_area[3]) > w2.pageY)) ) {
                     return;
                 }
-                
                 // update drag status
                 w3.is_drag(true);
                 
